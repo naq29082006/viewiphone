@@ -146,11 +146,23 @@ namespace Viewiphone.Forms
             _cboGridLayout = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                Width = 90,
+                Width = 140,
                 BackColor = Color.FromArgb(45, 45, 55),
                 ForeColor = Color.White
             };
-            _cboGridLayout.Items.AddRange(new object[] { "Auto", "1x1", "2x1", "2x2", "3x2", "3x3", "4x4" });
+            _cboGridLayout.Items.AddRange(new object[] {
+                "Auto (Phone Ratio)",
+                "1 Phone (1x1)",
+                "2 Phones (2x1)",
+                "3 Phones (3x1)",
+                "4 Phones (4x1)",
+                "4 Phones (2x2)",
+                "6 Phones (3x2)",
+                "8 Phones (4x2)",
+                "10 Phones (5x2)",
+                "9 Phones (3x3)",
+                "16 Phones (4x4)"
+            });
             _cboGridLayout.SelectedIndex = 0;
             _cboGridLayout.SelectedIndexChanged += OnGridLayoutChanged;
 
@@ -473,13 +485,17 @@ namespace Viewiphone.Forms
         {
             int preset = _cboGridLayout.SelectedIndex switch
             {
-                1 => 1,
-                2 => 2,
-                3 => 4,
-                4 => 6,
-                5 => 9,
-                6 => 16,
-                _ => 0 // Auto
+                1 => 1,  // 1x1
+                2 => 2,  // 2x1
+                3 => 3,  // 3x1
+                4 => 4,  // 4x1
+                5 => 5,  // 2x2
+                6 => 6,  // 3x2
+                7 => 7,  // 4x2
+                8 => 8,  // 5x2
+                9 => 9,  // 3x3
+                10 => 16,// 4x4
+                _ => 0   // Auto
             };
             _dashboardControl.SetGridLayout(preset);
         }

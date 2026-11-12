@@ -115,8 +115,8 @@ namespace Viewiphone.Controls
 
                     g.DrawImage(frameToDraw, destRect);
 
-                    // Draw OSD overlay (FPS, Bitrate, Resolution)
-                    DrawOsdOverlay(g, frameToDraw.Width, frameToDraw.Height);
+                    // Note: OSD overlay is now displayed in the DeviceCard footer
+                    // to prevent obstructing the phone screen (dock icons, keypad, etc.)
                 }
                 finally
                 {

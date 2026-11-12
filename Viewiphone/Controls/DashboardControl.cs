@@ -27,6 +27,7 @@ namespace Viewiphone.Controls
                 Padding = new Padding(4),
                 Margin = new Padding(0)
             };
+            _gridPanel.Resize += (s, e) => UpdateCardSizes();
 
             Controls.Add(_gridPanel);
 
@@ -99,11 +100,20 @@ namespace Viewiphone.Controls
         {
             var card = new DeviceCard(session)
             {
-                Dock = DockStyle.Fill
+                Dock = DockStyle.None,
+                Anchor = AnchorStyles.None,
+                Margin = new Padding(2)
             };
 
             card.MaximizeRequested += OnCardMaximizeRequested;
             card.SettingsRequested += (c) => SettingsRequested?.Invoke(c);
+            card.AspectRatioChanged += (c) =>
+            {
+                if (IsHandleCreated && !IsDisposed)
+                {
+                    try { BeginInvoke(new Action(UpdateCardSizes)); } catch { }
+                }
+            };
 
             return card;
         }
@@ -148,6 +158,7 @@ namespace Viewiphone.Controls
                 _gridPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f));
                 _gridPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
                 _gridPanel.Controls.Add(_maximizedCard, 0, 0);
+                UpdateCardSizes();
                 _gridPanel.ResumeLayout(true);
                 return;
             }
@@ -168,8 +179,12 @@ namespace Viewiphone.Controls
                 {
                     1 => (1, 1),
                     2 => (2, 1),
-                    4 => (2, 2),
+                    3 => (3, 1),
+                    4 => (4, 1),
+                    5 => (2, 2),
                     6 => (3, 2),
+                    7 => (4, 2),
+                    8 => (5, 2),
                     9 => (3, 3),
                     16 => (4, 4),
                     _ => CalculateAutoGrid(count)
@@ -204,16 +219,55 @@ namespace Viewiphone.Controls
                 cardIdx++;
             }
 
+            UpdateCardSizes();
             _gridPanel.ResumeLayout(true);
+        }
+
+        private void UpdateCardSizes()
+        {
+            if (_cards.Count == 0 || _gridPanel.ColumnCount == 0 || _gridPanel.RowCount == 0) return;
+
+            int cols = _gridPanel.ColumnCount;
+            int rows = _gridPanel.RowCount;
+
+            int cellW = Math.Max(50, (_gridPanel.ClientSize.Width / cols) - 8);
+            int cellH = Math.Max(80, (_gridPanel.ClientSize.Height / rows) - 8);
+
+            const int extraH = 62; // Header (32) + Footer (26) + Margins/Border (4)
+
+            foreach (var card in _cards.Values)
+            {
+                if (_maximizedCard != null && card != _maximizedCard) continue;
+
+                float ratio = card.AspectRatio; // e.g. 9/16 = 0.5625
+
+                // Fit by height first
+                int targetH = cellH;
+                int targetVideoH = Math.Max(20, targetH - extraH);
+                int targetW = (int)(targetVideoH * ratio) + 2;
+
+                // If wider than cell, fit by cell width
+                if (targetW > cellW)
+                {
+                    targetW = cellW;
+                    int targetVideoW = Math.Max(20, targetW - 2);
+                    targetH = Math.Min(cellH, (int)(targetVideoW / ratio) + extraH);
+                }
+
+                card.Size = new Size(Math.Max(120, targetW), Math.Max(100, targetH));
+            }
         }
 
         private static (int cols, int rows) CalculateAutoGrid(int count)
         {
             if (count <= 1) return (1, 1);
             if (count == 2) return (2, 1);
-            if (count <= 4) return (2, 2);
+            if (count == 3) return (3, 1);
+            if (count == 4) return (4, 1);
             if (count <= 6) return (3, 2);
-            if (count <= 9) return (3, 3);
+            if (count <= 8) return (4, 2);
+            if (count <= 10) return (5, 2);
+            if (count <= 12) return (4, 3);
             return (4, 4); // Up to 16
         }
     }
