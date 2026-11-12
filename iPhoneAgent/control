@@ -1,0 +1,9 @@
+Package: com.viewiphone.agent
+Name: iPhone Screen Agent
+Version: 1.0.0
+Architecture: iphoneos-arm64
+Description: High-performance H.264 real-time screen capture streaming daemon for Dopamine Rootless.
+Maintainer: Senior iOS Reverse Engineering Developer
+Author: ViewiPhone Project
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000), firmware (>= 15.0)

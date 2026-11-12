@@ -1,0 +1,21 @@
+# Visual Studio & C# artifacts
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs
+logs/
+*.log
+
+# FFmpeg binaries (large files)
+**/ffmpeg/*.dll
+
+# Theos build artifacts
+.theos/
+packages/
+_/*
+*.deb

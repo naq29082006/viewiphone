@@ -1,0 +1,38 @@
+name: Build iPhoneAgent (Dopamine Rootless)
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Rootless Tweak
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Theos
+        uses: waruhachi/theos-action@v2.4.6
+        with:
+          theos-src: 'theos/theos'
+          theos-branch: 'master'
+          sdks-src: 'theos/sdks'
+          sdks-branch: 'master'
+
+      - name: Build Rootless Package
+        run: |
+          cd iPhoneAgent
+          make clean
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+
+      - name: Upload .deb Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: iPhoneAgent-Rootless-deb
+          path: iPhoneAgent/packages/*.deb
+          if-no-files-found: error
